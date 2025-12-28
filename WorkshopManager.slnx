@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="WorkshopManager.API/WorkshopManager.API.csproj" />
+  <Project Path="WorkshopManager.Application/WorkshopManager.Application.csproj" />
+  <Project Path="WorkshopManager.Domain/WorkshopManager.Domain.csproj" />
+  <Project Path="WorkshopManager.Infrastructure/WorkshopManager.Infrastructure.csproj" />
+</Solution>
