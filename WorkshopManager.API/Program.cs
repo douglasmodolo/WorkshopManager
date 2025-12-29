@@ -1,3 +1,5 @@
+using FluentValidation;
+using System.Globalization;
 using WorkshopManager.API.Middleware;
 using WorkshopManager.Application;
 using WorkshopManager.Domain.Common;
@@ -5,6 +7,8 @@ using WorkshopManager.Infrastructure;
 using WorkshopManager.Infrastructure.Tenancy;
 
 var builder = WebApplication.CreateBuilder(args);
+
+ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("pt-BR");
 
 builder.Services.AddControllers();
 

@@ -16,10 +16,8 @@ namespace WorkshopManager.Application.Features.Customers.Commands.CreateCustomer
                 request.DocumentId
             );
 
-            // 1. Adiciona através do repositório exposto pelo UoW
             await unitOfWork.Customers.AddAsync(customer, cancellationToken);
 
-            // 2. Commita a transação única
             await unitOfWork.CommitAsync(cancellationToken);
 
             return customer.Id;
