@@ -15,7 +15,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    // Usando global:: garantimos que ele pegue a biblioteca externa do NuGet
     c.SwaggerDoc("v1", new global::Microsoft.OpenApi.Models.OpenApiInfo { Title = "Workshop Manager API", Version = "v1" });
 
     c.AddSecurityDefinition("TenantId", new global::Microsoft.OpenApi.Models.OpenApiSecurityScheme
