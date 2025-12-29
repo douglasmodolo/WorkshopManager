@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WorkshopManager.Domain.Common;
+using WorkshopManager.Domain.Interfaces;
 using WorkshopManager.Infrastructure.Data;
+using WorkshopManager.Infrastructure.Repositories;
 using WorkshopManager.Infrastructure.Tenancy;
 
 namespace WorkshopManager.Infrastructure
@@ -18,8 +20,8 @@ namespace WorkshopManager.Infrastructure
                     b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
             services.AddScoped<ITenantProvider, TenantProvider>();
-
-            // services.AddScoped<IVehicleRepository, VehicleRepository>();
+            
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

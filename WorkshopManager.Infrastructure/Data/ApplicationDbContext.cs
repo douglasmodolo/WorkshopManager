@@ -8,6 +8,7 @@ namespace WorkshopManager.Infrastructure.Data
     public class ApplicationDbContext : DbContext
     {
         private readonly ITenantProvider _tenantProvider;
+        public Guid CurrentTenantId => _tenantProvider.GetTenantId();
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ITenantProvider tenantProvider)
             : base(options)
@@ -24,22 +25,22 @@ namespace WorkshopManager.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
-            var tenantId = _tenantProvider.GetTenantId();
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
                 {
                     var parameter = Expression.Parameter(entityType.ClrType, "e");
-                    var body = Expression.Equal(
-                        Expression.Property(parameter, nameof(BaseEntity.TenantId)),
-                        Expression.Constant(tenantId));
 
-                    var lambda = Expression.Lambda(body, parameter);
-                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+                    var filter = Expression.Lambda(
+                        Expression.Equal(
+                            Expression.Property(parameter, nameof(BaseEntity.TenantId)),
+                            Expression.Property(Expression.Constant(this), nameof(CurrentTenantId))
+                        ),
+                        parameter);
+
+                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(filter);
                 }
             }
         }
