@@ -7,10 +7,12 @@ namespace WorkshopManager.Infrastructure.Repositories
     {
         private readonly ApplicationDbContext _context;
         private ICustomerRepository? _customers;
+        private IVehicleRepository? _vehicles;
 
         public UnitOfWork(ApplicationDbContext context) => _context = context;
 
         public ICustomerRepository Customers => _customers ??= new CustomerRepository(_context);
+        public IVehicleRepository Vehicles => _vehicles ??= new VehicleRepository(_context);
 
         public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
             => await _context.SaveChangesAsync(cancellationToken);
