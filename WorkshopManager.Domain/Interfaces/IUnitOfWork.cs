@@ -5,6 +5,7 @@
         ICustomerRepository Customers { get; }
         IVehicleRepository Vehicles { get; }
         IProductRepository Products { get; }
+        IServiceRepository Services { get; }
 
         Task<int> CommitAsync(CancellationToken cancellationToken = default);
     }

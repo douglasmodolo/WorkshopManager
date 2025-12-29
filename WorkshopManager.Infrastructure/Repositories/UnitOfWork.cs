@@ -9,12 +9,14 @@ namespace WorkshopManager.Infrastructure.Repositories
         private ICustomerRepository? _customers;
         private IVehicleRepository? _vehicles;
         private IProductRepository? _products;
+        private IServiceRepository? _services;
 
         public UnitOfWork(ApplicationDbContext context) => _context = context;
 
         public ICustomerRepository Customers => _customers ??= new CustomerRepository(_context);
         public IVehicleRepository Vehicles => _vehicles ??= new VehicleRepository(_context);
         public IProductRepository Products => _products ??= new ProductRepository(_context);
+        public IServiceRepository Services => _services ??= new ServiceRepository(_context);
 
         public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
             => await _context.SaveChangesAsync(cancellationToken);
