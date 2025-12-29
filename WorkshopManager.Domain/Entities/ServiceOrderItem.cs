@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WorkshopManager.Domain.Exceptions;
+﻿using WorkshopManager.Domain.Exceptions;
 
 namespace WorkshopManager.Domain.Entities
 {
@@ -22,7 +17,13 @@ namespace WorkshopManager.Domain.Entities
         public ServiceOrderItem(Guid serviceOrderId, Guid? productId, Guid? serviceId, int quantity, decimal unitPrice)
         {
             if (productId == null && serviceId == null)
-                throw new DomainException("Item must be either a product or a service.");
+                throw new BusinessException("O item deve ser obrigatoriamente um produto ou um serviço.");
+
+            if (quantity <= 0)
+                throw new BusinessException("A quantidade deve ser maior que zero.");
+
+            if (unitPrice < 0)
+                throw new BusinessException("O preço unitário não pode ser negativo.");
 
             ServiceOrderId = serviceOrderId;
             ProductId = productId;

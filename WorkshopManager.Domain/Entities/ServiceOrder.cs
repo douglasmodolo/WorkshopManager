@@ -34,7 +34,7 @@ namespace WorkshopManager.Domain.Entities
         public void AddItem(Guid? productId, Guid? serviceId, int quantity, decimal unitPrice)
         {
             if (Status != ServiceOrderStatus.Draft && Status != ServiceOrderStatus.PendingApproval)
-                throw new DomainException("Cannot add items to an order in this status.");
+                throw new BusinessException("Não é possível adicionar itens a uma ordem com o status atual.");
 
             var item = new ServiceOrderItem(Id, productId, serviceId, quantity, unitPrice);
             _items.Add(item);
@@ -43,10 +43,18 @@ namespace WorkshopManager.Domain.Entities
         public void Complete()
         {
             if (Status != ServiceOrderStatus.InProgress)
-                throw new DomainException("Order must be In Progress to be completed.");
+                throw new BusinessException("A ordem deve estar 'Em Andamento' para poder ser concluída.");
 
             Status = ServiceOrderStatus.Completed;
             ExitDate = DateTime.UtcNow;
+        }
+
+        public void ApplyDiscount(decimal amount)
+        {
+            if (amount < 0)
+                throw new BusinessException("O desconto não pode ser um valor negativo.");
+
+            Discount = amount;
         }
     }
 }
