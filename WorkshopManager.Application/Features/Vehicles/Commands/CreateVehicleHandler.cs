@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using WorkshopManager.Domain.Entities;
+using WorkshopManager.Domain.Exceptions;
 using WorkshopManager.Domain.Interfaces;
 
 namespace WorkshopManager.Application.Features.Vehicles.Commands
@@ -12,7 +13,7 @@ namespace WorkshopManager.Application.Features.Vehicles.Commands
 
             if (customer == null)
             {
-                throw new Exception("Cliente não encontrado ou não pertence a esta oficina.");
+                throw new NotFoundException($"O cliente com ID {request.CustomerId} não foi encontrado para esta oficina.");
             }
 
             var vehicle = new Vehicle(

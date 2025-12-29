@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using WorkshopManager.Domain.Exceptions;
 
@@ -6,37 +7,35 @@ namespace WorkshopManager.API.Middleware
 {
     public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
     {
-        public async ValueTask<bool> TryHandleAsync(
-            HttpContext httpContext,
-            Exception exception,
-            CancellationToken cancellationToken)
+        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            logger.LogError(exception, "Ocorreu um erro não tratado: {Message}", exception.Message);
+            logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
+
+            var (statusCode, title) = exception switch
+            {
+                NotFoundException => (StatusCodes.Status404NotFound, "Recurso não encontrado"),
+                BusinessException => (StatusCodes.Status400BadRequest, "Regra de negócio violada"),
+                ValidationException => (StatusCodes.Status400BadRequest, "Erro de Validação"),
+                _ => (StatusCodes.Status500InternalServerError, "Erro interno do servidor")
+            };
 
             var problemDetails = new ProblemDetails
             {
+                Status = statusCode,
+                Title = title,
+                Detail = exception is ValidationException valEx
+                    ? string.Join(", ", valEx.Errors.Select(e => e.ErrorMessage))
+                    : exception.Message,
                 Instance = httpContext.Request.Path
             };
 
-            switch (exception)
+            if (statusCode == StatusCodes.Status500InternalServerError)
             {
-                case DomainException domainEx:
-                    problemDetails.Status = StatusCodes.Status400BadRequest;
-                    problemDetails.Title = "Regra de Negócio";
-                    problemDetails.Detail = domainEx.Message;
-                    break;
-
-                default:
-                    problemDetails.Status = StatusCodes.Status500InternalServerError;
-                    problemDetails.Title = "Erro de Servidor";
-                    problemDetails.Detail = "Ocorreu um erro inesperado. Tente novamente mais tarde.";
-                    break;
+                problemDetails.Detail = "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.";
             }
 
-            httpContext.Response.StatusCode = problemDetails.Status.Value;
-
-            await httpContext.Response
-                .WriteAsJsonAsync(problemDetails, cancellationToken);
+            httpContext.Response.StatusCode = statusCode;
+            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
             return true;
         }

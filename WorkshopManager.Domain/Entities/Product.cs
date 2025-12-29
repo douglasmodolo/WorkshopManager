@@ -26,14 +26,20 @@ namespace WorkshopManager.Domain.Entities
 
         public void RemoveFromStock(int quantity)
         {
-            if (quantity <= 0) throw new DomainException("Quantity must be greater than zero.");
-            if (StockQuantity < quantity) throw new DomainException($"Insufficient stock for {Name}.");
+            if (quantity <= 0)
+                throw new BusinessException("A quantidade deve ser maior que zero.");
+
+            if (StockQuantity < quantity)
+                throw new BusinessException($"Estoque insuficiente para o produto: {Name}.");
 
             StockQuantity -= quantity;
         }
 
         public void AddToStock(int quantity)
         {
+            if (quantity <= 0)
+                throw new BusinessException("A quantidade a ser adicionada deve ser maior que zero.");
+
             StockQuantity += quantity;
         }
     }
